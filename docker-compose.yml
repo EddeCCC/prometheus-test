@@ -4,19 +4,34 @@ services:
     image: prom/prometheus:v3.1.0
     container_name: prometheus
     restart: unless-stopped
-    network_mode: host
+    #network_mode: host # for Linux
+    ports:
+      - 9090:9090
     volumes:
       - ./prometheus:/etc/prometheus
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-exporter
+    restart: unless-stopped
+    command: [ "--config.file=/etc/blackbox_exporter/blackbox.yml" ]
+    ports:
+      - 9115:9115
+    volumes:
+      - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
 
   grafana:
     image: grafana/grafana:11.2.0
     attach: false
     container_name: grafana
     restart: unless-stopped
-    network_mode: host
+    #network_mode: host # for Linux
+    ports:
+      - 3000:3000
     volumes:
       - grafana-storage:/var/lib/grafana
       - ./grafana/provisioning:/usr/share/grafana/custom/
+      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
     environment:
       - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
       - GF_SECURITY_ADMIN_PASSWORD=demo
