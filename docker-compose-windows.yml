@@ -1,0 +1,57 @@
+services:
+
+  # Windows to install the windows_exporter with IIS-collector
+  windows:
+    image: dockurr/windows
+    container_name: windows
+    environment:
+      VERSION: "11"
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8006:8006
+      - 3389:3389/tcp
+      - 3389:3389/udp
+    stop_grace_period: 2m
+    volumes:
+      - windows-storage:/storage
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus-windows.yml:/etc/prometheus/prometheus.yml
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-exporter
+    restart: unless-stopped
+    ports:
+      - 9115:9115
+    volumes:
+      - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    attach: false
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/usr/share/grafana/custom/
+      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
+    environment:
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+      - GF_SECURITY_ADMIN_PASSWORD=demo
+
+volumes:
+  grafana-storage:
+  windows-storage:
