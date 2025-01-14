@@ -24,11 +24,12 @@ services:
     image: mdoubez/filestat_exporter
     container_name: filestat-exporter
     restart: unless-stopped
-    command: [ "-path.cwd", "/my-data", "*" ]
+    command: [ "-path.cwd", "/exporter/data", "-config.file", "/exporter/filestat.yml" ]
     ports:
       - 9943:9943
     volumes:
-      - ./grafana/dashboards:/my-data # for example, track the folder grafana/dashboards
+      - ./grafana:/exporter/data # for example, track all files in the folder grafana
+      - ./filestat.yml:/exporter/filestat.yml
 
 
   grafana:

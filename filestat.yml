@@ -1,0 +1,15 @@
+exporter:
+  #! Working directory of exporter - overridden by parameter '-path.cwd'
+  #working_directory: "."
+
+  #! Network parameters
+  #listen_address: ':9943'
+  #metrics_path: /metrics
+
+  enable_crc32_metric: true
+  enable_nb_line_metric: true
+
+  #! list of patterns to apply
+  files:
+    - patterns: ['**/*']
+
