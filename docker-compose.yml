@@ -20,6 +20,17 @@ services:
     volumes:
       - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
 
+  filestat-exporter:
+    image: mdoubez/filestat_exporter
+    container_name: filestat-exporter
+    restart: unless-stopped
+    command: [ "-path.cwd", "/my-data", "*" ]
+    ports:
+      - 9943:9943
+    volumes:
+      - ./grafana/dashboards:/my-data # for example, track the folder grafana/dashboards
+
+
   grafana:
     image: grafana/grafana:11.2.0
     attach: false

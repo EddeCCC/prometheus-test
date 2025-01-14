@@ -10,6 +10,10 @@ scrape_configs:
     static_configs:
       - targets: ['host.docker.internal:9182']
 
+  - job_name: 'filestat_exporter'
+    static_configs:
+      - targets: [ 'host.docker.internal:9943' ] # Change to localhost in Linux
+
   - job_name: 'blackbox' # Get metrics from the exporter itself
     static_configs:
       - targets: ['host.docker.internal:9115'] # Change to localhost in Linux
