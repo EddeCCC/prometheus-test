@@ -1,0 +1,68 @@
+services:
+
+  # all-in-one image for Mimir
+  mimir:
+    image: grafana/mimir:2.15.0
+    container_name: mimir
+    restart: unless-stopped
+    command: [ "-config.file=/etc/mimir.yml" ]
+    ports:
+      - 9093:9093  # Querying Mimir
+      - 8080:8080  # Mimir API
+      - 9009:9009
+    volumes:
+      - ./mimir.yml:/etc/mimir.yml
+
+  # object storage
+  minio:
+    image: minio/minio:latest
+    container_name: minio-mimir
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=secretkey
+    ports:
+      - 9001:9001
+    volumes:
+      - minio-data:/data
+
+  # Exporter to generate data
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-exporter
+    restart: unless-stopped
+    ports:
+      - 9115:9115
+    volumes:
+      - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
+    restart: unless-stopped
+    #network_mode: host # for Linux
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus-mimir.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    attach: false
+    container_name: grafana
+    restart: unless-stopped
+    #network_mode: host # for Linux
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/usr/share/grafana/custom/
+      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
+    environment:
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+      - GF_SECURITY_ADMIN_PASSWORD=demo
+
+volumes:
+  grafana-storage:
+  minio-data:

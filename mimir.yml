@@ -1,0 +1,21 @@
+multitenancy_enabled: false # Important!
+
+common:
+  storage:
+    backend: s3
+    s3:
+      endpoint: minio:9000
+      access_key_id: minio
+      secret_access_key: secretkey
+      bucket_name: my-bucket  # Bucket muss per Hand in localhost:9001 angelegt werden
+      insecure: true
+
+blocks_storage:
+  storage_prefix: blocks
+
+ingester:
+  ring:
+    replication_factor: 1
+
+server:
+  http_listen_port: 9009

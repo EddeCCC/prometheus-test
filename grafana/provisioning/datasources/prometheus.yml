@@ -5,4 +5,5 @@ datasources:
     type: prometheus
     access: proxy
     isDefault: true
+    editable: true
     url: http://host.docker.internal:9090 # change to localhost in Linux
