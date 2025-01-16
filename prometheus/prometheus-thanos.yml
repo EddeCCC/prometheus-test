@@ -1,0 +1,26 @@
+global:
+  scrape_interval: 15s
+  external_labels: # we have to use external labels with Thanos!
+    cluster: "demo"
+    replica: "prometheus-1"
+
+scrape_configs:
+  - job_name: 'blackbox' # Get metrics from the exporter itself
+    static_configs:
+      - targets: ['host.docker.internal:9115'] # Change to localhost in Linux
+
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - 'http://prometheus.io'
+          - 'https://www.novatec-gmbh.de'
+    relabel_configs:
+      - source_labels: [ __address__ ]
+        target_label: __param_target
+      - source_labels: [ __param_target ]
+        target_label: instance
+      - target_label: __address__
+        replacement: host.docker.internal:9115 # Change to localhost in Linux

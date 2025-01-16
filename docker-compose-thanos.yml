@@ -1,0 +1,117 @@
+# TODO Not working yet... The sidecar does not get any data from Prometheus
+services:
+
+  # Read data from one Prometheus (and write to object storage)
+  thanos-sidecar:
+    image: thanosio/thanos:main-2025-01-10-4ba0ba4
+    container_name: thanos-sidecar
+    restart: unless-stopped
+    command:
+      - "sidecar"
+      - "--prometheus.url"
+      - "http://prometheus:9090"
+      - "--objstore.config-file"
+      - "/etc/store.yml"
+      - "--tsdb.path=/prometheus"
+    volumes:
+      - ./thanos/store.yml:/etc/store.yml
+      - prometheus-data:/prometheus
+    depends_on:
+      - prometheus
+
+  # Query older data from object storage gateway
+  thanos-storage-gateway:
+    image: thanosio/thanos:main-2025-01-10-4ba0ba4
+    container_name: thanos-storage-gateway
+    restart: unless-stopped
+    command: ["store", "--objstore.config-file", "/etc/store.yml", "--data-dir", "/tmp/data"]
+    volumes:
+      - ./thanos/store.yml:/etc/store.yml
+    depends_on:
+      - minio
+
+  # Query recent data from sidecar or storage
+  thanos-querier:
+    image: thanosio/thanos:main-2025-01-10-4ba0ba4
+    container_name: thanos-querier
+    restart: unless-stopped
+    command: ["query", "--http-address", "0.0.0.0:9091", "--query.replica-label", "replica"]
+    ports:
+      - 9091:9091
+    depends_on:
+      - thanos-sidecar
+      - thanos-storage-gateway
+
+  # Downsampling of data in object storage
+#  thanos-compactor:
+#    image: thanosio/thanos:main-2025-01-10-4ba0ba4
+#    container_name: thanos-compactor
+#    restart: unless-stopped
+#    command: ["compact", "--objstore.config-file", "/etc/store.yml", "--data-dir", "/tmp/data"]
+#    volumes:
+#      - ./thanos/store.yml:/etc/store.yml
+#    depends_on:
+#      - thanos-storage-gateway
+
+  # object storage
+  minio:
+    image: minio/minio:latest
+    container_name: minio-thanos
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=secretkey
+    ports:
+      - 9001:9001
+    volumes:
+      - minio-data:/data
+
+  # Exporter to generate data
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-exporter
+    restart: unless-stopped
+    ports:
+      - 9115:9115
+    volumes:
+      - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
+    restart: unless-stopped
+    #network_mode: host # for Linux
+    command:
+      - "--storage.tsdb.min-block-duration"
+      - "2h"
+      - "--storage.tsdb.max-block-duration"
+      - "2h"
+      - "--web.enable-lifecycle"
+      - "--storage.tsdb.path=/prometheus"
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus-thanos.yml:/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    attach: false
+    container_name: grafana
+    restart: unless-stopped
+    #network_mode: host # for Linux
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/usr/share/grafana/custom/
+      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
+    environment:
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+      - GF_SECURITY_ADMIN_PASSWORD=demo
+
+volumes:
+  grafana-storage:
+  minio-data:
+  prometheus-data:

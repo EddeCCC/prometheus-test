@@ -1,0 +1,7 @@
+type: S3
+config:
+  endpoint: minio:9000
+  access_key: minio
+  secret_key: secretkey
+  bucket: my-bucket  # Bucket muss per Hand in localhost:9001 angelegt werden
+  insecure: true
