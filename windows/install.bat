@@ -19,11 +19,11 @@ iisreset /start
 echo IIS should be enabled and started
 
 :: Check if windows_exporter.exe exists
-if exist "windows_exporter-0.30.0-amd64.exe" (
+if exist "%~dp0windows_exporter-0.30.0-amd64.exe" (
     echo Starting windows_exporter...
 
     :: Start the .exe and print output to terminal
-    start cmd /k windows_exporter-0.30.0-amd64.exe --collectors.enabled "iis,[defaults]"
+    start cmd /k %~dp0windows_exporter-0.30.0-amd64.exe --collectors.enabled "iis,[defaults]"
 ) else (
     echo windows_exporter.exe not found
 )
