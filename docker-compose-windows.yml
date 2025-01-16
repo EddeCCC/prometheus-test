@@ -6,6 +6,9 @@ services:
     container_name: windows
     environment:
       VERSION: "11"
+      LANGUAGE: "German"
+      REGION: "de-DE"
+      KEYBOARD: "de-DE"
     devices:
       - /dev/kvm
       - /dev/net/tun
@@ -18,29 +21,21 @@ services:
     stop_grace_period: 2m
     volumes:
       - windows-storage:/storage
+      - ./windows/:/oem  # post-installation script
 
   prometheus:
     image: prom/prometheus:v3.1.0
-    container_name: prometheus
+    container_name: prometheus-windows
     restart: unless-stopped
     ports:
       - 9090:9090
     volumes:
       - ./prometheus/prometheus-windows.yml:/etc/prometheus/prometheus.yml
 
-  blackbox-exporter:
-    image: prom/blackbox-exporter:v0.25.0
-    container_name: blackbox-exporter
-    restart: unless-stopped
-    ports:
-      - 9115:9115
-    volumes:
-      - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
-
   grafana:
     image: grafana/grafana:11.2.0
     attach: false
-    container_name: grafana
+    container_name: grafana-windows
     restart: unless-stopped
     ports:
       - 3000:3000
