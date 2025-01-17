@@ -27,7 +27,8 @@ if exist "%~dp0windows_exporter.exe" (
     sc config windows_exporter start= auto
     sc start windows_exporter
 
-    :: start cmd /k %~dp0windows_exporter.exe --collectors.enabled "iis,[defaults]"
+    :: Check status
+    sc query windows_exporter
 ) else (
     echo windows_exporter.exe not found
 )
