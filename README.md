@@ -22,4 +22,4 @@ Includes Mimir as long-term storage and collects data via Blackbox-Exporter
 
 ## Thanos Scenario (wip)
 
-Includes Mimir as long-term storage and collects data via Blackbox-Exporter
+Includes Thanos as long-term storage and collects data via Blackbox-Exporter
