@@ -17,6 +17,7 @@
 	 "forwardPorts": [
 		9100,	// Node exporter
 		9090, 	// Prometheus
+	 	9091,  	// Prometheus for windows-exporter
 		3000	// Grafana
 	 ],
 

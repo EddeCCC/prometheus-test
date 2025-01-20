@@ -9,6 +9,8 @@ services:
       - 9090:9090
     volumes:
       - ./prometheus:/etc/prometheus
+    extra_hosts:
+      - local:host-gateway # access local node exporter
 
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.25.0
