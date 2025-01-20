@@ -51,6 +51,7 @@ services:
 volumes:
   grafana-storage:
 
+# Has to be created manually beforehand via `docker network create grafana-shared`
 networks:
   grafana-shared:
     external: true
