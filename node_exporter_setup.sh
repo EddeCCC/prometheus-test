@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo RUNNING NODE EXPORTER SET UP SCRIPT
 mkdir -p /workspaces/node-exporter
 
 # Download the node-exporter
