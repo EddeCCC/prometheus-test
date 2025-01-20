@@ -13,4 +13,7 @@ tar xvfz /workspaces/node-exporter/node-exporter.tar.gz -C /workspaces/node-expo
 
 # Start the exporter
 echo Starting node-exporter...
-/workspaces/node-exporter/node_exporter-1.8.2.linux-amd64/node_exporter
+/workspaces/node-exporter/node_exporter-1.8.2.linux-amd64/node_exporter &
+
+# Finish
+exit 0
