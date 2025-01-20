@@ -16,18 +16,13 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	 "forwardPorts": [
 		9100,	// Node exporter
-		9009, 	// Prometheus
+		9090, 	// Prometheus
+	 	9091,  	// Prometheus for windows-exporter
 		3000	// Grafana
 	 ],
 
-	// Install docker compose, download node_exporter and start it
-	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose",
-
-	// Set up node exporter
-	"postStartCommand": "./node_exporter_setup.sh",
-
-	// Keep the container running
-	"runArgs": ["--entrypoint", "tail", "-f", "/dev/null"],
+	// Install docker compose, create docker network, set up node-exporter
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose && docker network create grafana-shared && chmod +x node_exporter_setup.sh && ./node_exporter_setup.sh",
 
 	// Configure tool-specific properties.
 	 "customizations": {

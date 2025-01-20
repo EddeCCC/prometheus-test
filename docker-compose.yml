@@ -4,17 +4,19 @@ services:
     image: prom/prometheus:v3.1.0
     container_name: prometheus
     restart: unless-stopped
-    #network_mode: host # for Linux
+    networks: [ grafana-shared ]
     ports:
       - 9090:9090
     volumes:
       - ./prometheus:/etc/prometheus
+    extra_hosts:
+      - local:host-gateway # access local node exporter
 
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.25.0
     container_name: blackbox-exporter
     restart: unless-stopped
-    #command: [ "--config.file=/etc/blackbox_exporter/blackbox.yml" ] # load custom configuration
+    networks: [ grafana-shared ]
     ports:
       - 9115:9115
     volumes:
@@ -24,6 +26,7 @@ services:
     image: mdoubez/filestat_exporter
     container_name: filestat-exporter
     restart: unless-stopped
+    networks: [ grafana-shared ]
     command: [ "-path.cwd", "/exporter/data", "-config.file", "/exporter/filestat.yml" ]
     ports:
       - 9943:9943
@@ -31,13 +34,12 @@ services:
       - ./grafana:/exporter/data # for example, track all files in the folder grafana
       - ./filestat.yml:/exporter/filestat.yml
 
-
   grafana:
     image: grafana/grafana:11.2.0
     attach: false
     container_name: grafana
     restart: unless-stopped
-    #network_mode: host # for Linux
+    networks: [ grafana-shared ]
     ports:
       - 3000:3000
     volumes:
@@ -50,3 +52,8 @@ services:
 
 volumes:
   grafana-storage:
+
+# Has to be created manually beforehand via `docker network create grafana-shared`
+networks:
+  grafana-shared:
+    external: true
