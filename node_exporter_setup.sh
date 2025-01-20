@@ -12,6 +12,6 @@ echo Extracting node-exporter...
 tar xvfz /workspaces/prometheus/node_exporter.tar.gz -C /workspaces/prometheus
 
 # Create symbolic link
-ln -s /workspaces/prometheus/node_exporter/node_exporter-1.8.2.linux-amd64/node_exporter /workspaces/prometheus/node_exporter
+ln -s /workspaces/prometheus/node_exporter-1.8.2.linux-amd64/node_exporter /workspaces/prometheus/node_exporter
 
 echo Run node-exporter with /workspaces/prometheus/node_exporter
