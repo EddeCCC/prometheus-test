@@ -4,6 +4,7 @@ services:
   windows:
     image: dockurr/windows
     container_name: windows
+    restart: unless-stopped
     environment:
       VERSION: "11"
       LANGUAGE: "German"
@@ -16,6 +17,7 @@ services:
       - NET_ADMIN
     ports:
       - 8006:8006
+      - 9182:9182
       - 3389:3389/tcp
       - 3389:3389/udp
     stop_grace_period: 2m
@@ -23,30 +25,35 @@ services:
       - windows-storage:/storage
       - ./windows/:/oem  # post-installation script
 
-  prometheus:
+  prometheus-windows:
     image: prom/prometheus:v3.1.0
     container_name: prometheus-windows
     restart: unless-stopped
+    networks: [ default, grafana-shared ]
     ports:
-      - 9090:9090
+      - 9091:9090
     volumes:
       - ./prometheus/prometheus-windows.yml:/etc/prometheus/prometheus.yml
 
-  grafana:
-    image: grafana/grafana:11.2.0
-    attach: false
-    container_name: grafana-windows
-    restart: unless-stopped
-    ports:
-      - 3000:3000
-    volumes:
-      - grafana-storage:/var/lib/grafana
-      - ./grafana/provisioning:/usr/share/grafana/custom/
-      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
-    environment:
-      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
-      - GF_SECURITY_ADMIN_PASSWORD=demo
+#  grafana:
+#    image: grafana/grafana:11.2.0
+#    attach: false
+#    container_name: grafana-windows
+#    restart: unless-stopped
+#    ports:
+#      - 3000:3000
+#    volumes:
+#      - grafana-storage:/var/lib/grafana
+#      - ./grafana/provisioning:/usr/share/grafana/custom/
+#      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
+#    environment:
+#      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+#      - GF_SECURITY_ADMIN_PASSWORD=demo
 
 volumes:
-  grafana-storage:
+  #grafana-storage:
   windows-storage:
+
+networks:
+  grafana-shared:
+    external: true

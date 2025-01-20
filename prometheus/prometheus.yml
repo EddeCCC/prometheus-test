@@ -6,17 +6,13 @@ scrape_configs:
     static_configs:
     - targets: ['localhost:9100']
 
-  - job_name: 'windows_exporter'
-    static_configs:
-      - targets: ['host.docker.internal:9182']
-
   - job_name: 'filestat_exporter'
     static_configs:
-      - targets: [ 'host.docker.internal:9943' ] # Change to localhost in Linux
+      - targets: [ 'filestat-exporter:9943' ]
 
   - job_name: 'blackbox' # Get metrics from the exporter itself
     static_configs:
-      - targets: ['host.docker.internal:9115'] # Change to localhost in Linux
+      - targets: ['blackbox-exporter:9115']
 
   - job_name: 'blackbox-http'
     metrics_path: /probe
@@ -32,7 +28,7 @@ scrape_configs:
       - source_labels: [ __param_target ]
         target_label: instance
       - target_label: __address__
-        replacement: host.docker.internal:9115 # Change to localhost in Linux
+        replacement: blackbox-exporter:9115 # Change to localhost in Linux
 
 #  - job_name: 'blackbox-cert'
 #    metrics_path: /probe
