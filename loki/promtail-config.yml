@@ -1,0 +1,41 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0 # assign the port dynamically
+
+positions:
+  filename: /tmp/positions.yaml # file path where Loki will store positions of log entries
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push # where to send log entries
+
+scrape_configs:
+  - job_name: "my-logs"
+    static_configs:
+      - targets: ["localhost"] # Scrape logs from localhost
+        labels:
+          job: my-logs
+          __path__: /var/generator/test*log # path pattern to look for logs
+          app: generated
+      - targets: ["localhost"]
+        labels:
+          job: my-fake-logs
+          __path__: /var/generator/fake.log
+          app: fake
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<date>.+?) INFO: This is (?P<sure>\w+)'
+      - labels:
+          sure: ""
+      - timestamp:
+          source: date
+          format: "Mon Jan 02 15:04:05 MST 2006" # use timestamp of logs, otherwise Loki uses the ingestion time as timestamp
+
+#  - job_name: "my-fake-logs"
+#    static_configs:
+#      - targets: [ "localhost" ]
+#        labels:
+#          job: my-fake-logs
+#          __path__: /var/generator/fake/*log
+#          env: fake
+
+
