@@ -8,7 +8,7 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     extra_hosts:
       - local:host-gateway # access local node exporter
 
@@ -23,7 +23,7 @@ services:
       - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
 
   filestat-exporter:
-    image: mdoubez/filestat_exporter
+    image: mdoubez/filestat_exporter:0.4.0
     container_name: filestat-exporter
     restart: unless-stopped
     networks: [ grafana-shared ]
@@ -31,7 +31,7 @@ services:
     ports:
       - 9943:9943
     volumes:
-      - ./grafana:/exporter/data # for example, track all files in the folder grafana
+      - ../grafana:/exporter/data # for example, track all files in the folder grafana
       - ./filestat.yml:/exporter/filestat.yml
 
   grafana:
@@ -44,8 +44,8 @@ services:
       - 3000:3000
     volumes:
       - grafana-storage:/var/lib/grafana
-      - ./grafana/provisioning:/usr/share/grafana/custom/
-      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
+      - ../grafana/provisioning:/usr/share/grafana/custom/
+      - ../grafana/dashboards:/usr/share/grafana/public/dashboards
     environment:
       - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
       - GF_SECURITY_ADMIN_PASSWORD=demo

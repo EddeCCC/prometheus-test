@@ -14,7 +14,7 @@ services:
       - "/etc/store.yml"
       - "--tsdb.path=/prometheus"
     volumes:
-      - ./thanos/store.yml:/etc/store.yml
+      - ./store.yml:/etc/store.yml
       - prometheus-data:/prometheus
     depends_on:
       - prometheus
@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
     command: ["store", "--objstore.config-file", "/etc/store.yml", "--data-dir", "/tmp/data"]
     volumes:
-      - ./thanos/store.yml:/etc/store.yml
+      - ./store.yml:/etc/store.yml
     depends_on:
       - minio
 
@@ -70,16 +70,16 @@ services:
   # Exporter to generate data
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.25.0
-    container_name: blackbox-exporter
+    container_name: blackbox-exporter-thanos
     restart: unless-stopped
     ports:
       - 9115:9115
     volumes:
-      - ./blackbox.yml:/etc/blackbox_exporter/blackbox.yml
+      - ../exporter/blackbox.yml:/etc/blackbox_exporter/blackbox.yml
 
   prometheus:
     image: prom/prometheus:v3.1.0
-    container_name: prometheus
+    container_name: prometheus-thanos
     restart: unless-stopped
     #network_mode: host # for Linux
     command:
@@ -92,21 +92,20 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus/prometheus-thanos.yml:/prometheus/prometheus.yml
+      - ./prometheus.yml:/prometheus/prometheus.yml
       - prometheus-data:/prometheus
 
   grafana:
     image: grafana/grafana:11.2.0
     attach: false
-    container_name: grafana
+    container_name: grafana-thanos
     restart: unless-stopped
-    #network_mode: host # for Linux
     ports:
       - 3000:3000
     volumes:
       - grafana-storage:/var/lib/grafana
-      - ./grafana/provisioning:/usr/share/grafana/custom/
-      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
+      - ../grafana/provisioning:/usr/share/grafana/custom/
+      - ../grafana/dashboards:/usr/share/grafana/public/dashboards
     environment:
       - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
       - GF_SECURITY_ADMIN_PASSWORD=demo
