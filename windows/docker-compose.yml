@@ -23,7 +23,7 @@ services:
     stop_grace_period: 2m
     volumes:
       - windows-storage:/storage
-      - ./windows/:/oem  # post-installation script
+      - ./oem:/oem  # post-installation script
 
   prometheus-windows:
     image: prom/prometheus:v3.1.0
@@ -33,25 +33,11 @@ services:
     ports:
       - 9091:9090
     volumes:
-      - ./prometheus/prometheus-windows.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
-#  grafana:
-#    image: grafana/grafana:11.2.0
-#    attach: false
-#    container_name: grafana-windows
-#    restart: unless-stopped
-#    ports:
-#      - 3000:3000
-#    volumes:
-#      - grafana-storage:/var/lib/grafana
-#      - ./grafana/provisioning:/usr/share/grafana/custom/
-#      - ./grafana/dashboards:/usr/share/grafana/public/dashboards
-#    environment:
-#      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
-#      - GF_SECURITY_ADMIN_PASSWORD=demo
+  # Use Grafana from /exporter
 
 volumes:
-  #grafana-storage:
   windows-storage:
 
 networks:

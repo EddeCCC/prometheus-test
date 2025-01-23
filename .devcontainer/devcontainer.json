@@ -18,11 +18,12 @@
 		9100,	// Node exporter
 		9090, 	// Prometheus
 	 	9091,  	// Prometheus for windows-exporter
-		3000	// Grafana
+		3000,	// Grafana
+	 	8006	// Windows
 	 ],
 
 	// Install docker compose, create docker network, set up node-exporter
-	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose && docker network create grafana-shared && chmod +x node_exporter_setup.sh && ./node_exporter_setup.sh",
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose && docker network create grafana-shared && chmod +x ./scripts/node_exporter_setup.sh && ./scripts/node_exporter_setup.sh",
 
 	// Configure tool-specific properties.
 	 "customizations": {
