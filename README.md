@@ -30,6 +30,11 @@ You have to run `docker network create grafana-shared` before starting the scena
 An IIS-Webserver and the Windows-Exporter will start automatically after first installation via batch-script.
 
 ---
+## Loki Scenario
+
+Scenario with Promtail to collect generated logs and Loki to store them.
+
+---
 ## Mimir Scenario
 
 This scenario uses Mimir as long-term storage and collects data via Blackbox-Exporter
@@ -37,4 +42,4 @@ This scenario uses Mimir as long-term storage and collects data via Blackbox-Exp
 ---
 ## Thanos Scenario (wip)
 
-This scenario uses Mimir as long-term storage and collects data via Blackbox-Exporter
+This scenario uses Thanos as long-term storage and collects data via Blackbox-Exporter
