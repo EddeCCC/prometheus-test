@@ -1,0 +1,39 @@
+services:
+
+  # Includes Carbon (listens for data), Whisper (stores data) & webapp
+  graphite:
+    image: graphiteapp/graphite-statsd:1.1.10-5
+    container_name: graphite
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 2003:2003
+
+  # Write random values to Graphite
+  data-generator:
+    build:
+      context: .
+    container_name: data-generator-graphite
+    restart: unless-stopped
+    environment:
+      - GRAPHITE_HOST=graphite
+    depends_on:
+      - graphite
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    attach: false
+    container_name: grafana-graphite
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ../grafana/provisioning:/usr/share/grafana/custom/
+      - ../grafana/dashboards:/usr/share/grafana/public/dashboards
+    environment:
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+      - GF_SECURITY_ADMIN_PASSWORD=demo
+
+volumes:
+  grafana-storage:
