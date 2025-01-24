@@ -35,11 +35,19 @@ An IIS-Webserver and the Windows-Exporter will start automatically after first i
 Scenario with Promtail to collect generated logs and Loki to store them.
 
 ---
+## Graphite Scenario
+
+Scenario with Graphite as datasource and synthetic data generator,
+which writes directly into Graphite via port 2003.
+
+---
 ## Mimir Scenario
 
-This scenario uses Mimir as long-term storage and collects data via Blackbox-Exporter
+This scenario uses Mimir as long-term storage and collects data via Blackbox-Exporter.
 
 ---
 ## Thanos Scenario (wip)
 
-This scenario uses Thanos as long-term storage and collects data via Blackbox-Exporter
+This scenario uses Thanos as long-term storage and collects data via Blackbox-Exporter.
+Currently, not working...
+
