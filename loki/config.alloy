@@ -1,0 +1,50 @@
+local.file_match "genlogs" {
+    path_targets = [{"__path__" = "/var/generator/test*log"}]
+}
+local.file_match "fakelogs" {
+    path_targets = [{"__path__" = "/var/generator/fake.log"}]
+}
+
+loki.source.file "gen_files" {
+    targets    = local.file_match.genlogs.targets
+    forward_to = [loki.process.add_new_label.receiver]
+}
+
+loki.source.file "fake_files" {
+    targets    = local.file_match.fakelogs.targets
+    forward_to = [loki.process.add_new_label.receiver]
+}
+
+// Transformation: pull some data out of the log message, and turn it into a label
+loki.process "add_new_label" {
+    stage.logfmt {
+        mapping = {
+            "extracted_level" = "level",
+            "extracted_message" = "message",
+        }
+    }
+
+    stage.labels {
+        values = {
+            "level" = "extracted_level",
+            "msg" = "extracted_message",
+        }
+    }
+
+    forward_to = [loki.relabel.add_static_label.receiver]
+}
+
+loki.relabel "add_static_label" {
+    forward_to = [loki.write.local_loki.receiver]
+
+    rule {
+        target_label = "os"
+        replacement  = constants.os
+    }
+}
+
+loki.write "local_loki" {
+    endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+    }
+}

@@ -34,6 +34,8 @@ An IIS-Webserver and the Windows-Exporter will start automatically after first i
 
 Scenario with Promtail to collect generated logs and Loki to store them.
 
+Run `docker compose -f docker-compose-alloy.yml` to use Grafana Alloy instead of Promtail.
+
 ---
 ## Graphite Scenario
 
