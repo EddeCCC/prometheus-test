@@ -1,0 +1,53 @@
+services:
+
+  # Stores logs
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: loki
+    restart: unless-stopped
+    volumes:
+      - ./local-config.yml:/etc/loki/local-config.yaml
+
+  # Agent to collect logs
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.114.0
+    container_name: otelcol
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-config.yml" ]
+    volumes:
+      - ./otel-config.yml:/etc/otelcol-config.yml
+      - shared-logs:/var/generator
+
+  # Just some minimalistic log generator
+  log-generator:
+    image: bash
+    container_name: log-generator
+    restart: unless-stopped
+    entrypoint: >
+      sh -c "while true; do
+      echo $(date) INFO: This is definitely a generated log >> /var/generator/test-1.log;
+      echo $(date) INFO: This is maybe a generated log >> /var/generator/test-2.log;
+      echo $(date) INFO: This is not a generated log >> /var/generator/fake.log;
+      sleep 5;
+      done"
+    volumes:
+      - shared-logs:/var/generator
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    attach: false
+    container_name: grafana-loki
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ../grafana/provisioning:/usr/share/grafana/custom/
+      - ../grafana/dashboards:/usr/share/grafana/public/dashboards
+    environment:
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/custom/
+      - GF_SECURITY_ADMIN_PASSWORD=demo
+
+volumes:
+  grafana-storage:
+  shared-logs:

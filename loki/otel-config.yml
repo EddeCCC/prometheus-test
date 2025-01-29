@@ -1,0 +1,57 @@
+receivers:
+  filelog/gen:
+    include:
+      - /var/generator/test*.log
+    start_at: beginning
+    operators:
+      - type: regex_parser
+        regex: '^(?P<date>.+?) INFO: This is (?P<sure>\w+)'
+        timestamp:
+          parse_from: attributes.date
+          layout: "%a %b %d %H:%M:%S %Z %Y"
+      - type: add
+        field: attributes.job
+        value: my-logs
+      - type: add
+        field: attributes.app
+        value: generated
+
+  filelog/fake:
+    include:
+      - /var/generator/fake.log
+    start_at: beginning
+    operators:
+      - type: regex_parser
+        regex: '^(?P<date>.+?) INFO: This is (?P<sure>\w+)'
+        timestamp:
+          parse_from: attributes.date
+          layout: "%a %b %d %H:%M:%S %Z %Y"
+      - type: add
+        field: attributes.job
+        value: my-fake-logs
+      - type: add
+        field: attributes.app
+        value: fake
+
+exporters:
+  debug:
+    verbosity: detailed
+  otlphttp/loki:
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+
+processors:
+  batch:
+  resource:
+    attributes:
+      - key: service.name
+        value: "log-collector"
+        action: upsert
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/gen, filelog/fake]
+      processors: [batch, resource]
+      exporters: [debug, otlphttp/loki]

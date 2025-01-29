@@ -4,6 +4,8 @@ This repository supports GitHub Codespaces. Start a codespace in your browser he
 
 You can start any scenario by running `docker compose up` in the specific directory.
 
+**GRAFANA LOGIN**: [user: admin, pwd: demo]
+
 ---
 ## Exporter Scenario
 
@@ -33,6 +35,8 @@ An IIS-Webserver and the Windows-Exporter will start automatically after first i
 ## Loki Scenario
 
 Scenario with Promtail to collect generated logs and Loki to store them.
+
+Run `docker compose -f docker-compose-otel.yml` to use an OTel collector instead of Promtail.
 
 Run `docker compose -f docker-compose-alloy.yml` to use Grafana Alloy instead of Promtail.
 
